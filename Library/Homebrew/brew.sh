@@ -114,11 +114,7 @@ else
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
-
-  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
-  then
-    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
-  fi
+  HOMEBREW_FORCE_BREWED_CURL=1
 
   if [[ -z "$HOMEBREW_CACHE" ]]
   then
@@ -136,6 +132,15 @@ if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
          "$HOMEBREW_PREFIX/opt/curl/bin/curl" --version >/dev/null
 then
   HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+elif [[ -x "/usr/bin/curl" ]]
+then
+  HOMEBREW_CURL="/usr/bin/curl"
+elif HOMEBREW_CURL="$(command -pv curl 2>/dev/null)"
+then
+  : "Using system-default curl."
+elif HOMEBREW_CURL="$(command -v curl 2>/dev/null)"
+then
+  : "Using user-default curl."
 else
   HOMEBREW_CURL="curl"
 fi
